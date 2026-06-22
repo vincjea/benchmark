@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC Build Benchmark Comparison</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f9f9f8;
+    color: #37352f;
+    padding: 24px 20px;
+    min-height: 100vh;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #37352f;
+    letter-spacing: -0.3px;
+  }
+
+  .header p {
+    font-size: 13px;
+    color: #9b9a97;
+    margin-top: 4px;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .dot-gina  { background: #e16259; }
+  .dot-vincer { background: #448361; }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #9b9a97;
+    margin-bottom: 10px;
+    padding-left: 2px;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid #e9e9e7;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+  }
+
+  .bench-row {
+    margin-bottom: 14px;
+  }
+
+  .bench-row:last-child { margin-bottom: 0; }
+
+  .bench-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .bench-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #37352f;
+  }
+
+  .bench-winner {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-weight: 600;
+  }
+
+  .winner-gina   { background: #fce8e6; color: #c0443c; }
+  .winner-vincer { background: #e6f3eb; color: #2e6b47; }
+  .winner-tie    { background: #f1f1ef; color: #6b6b6b; }
+
+  .bars {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .bar-pc-name {
+    font-size: 11px;
+    color: #9b9a97;
+    width: 44px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 8px;
+    background: #f1f1ef;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s ease;
+  }
+
+  .bar-fill.gina   { background: #e16259; }
+  .bar-fill.vincer { background: #448361; }
+
+  .bar-score {
+    font-size: 11px;
+    font-weight: 700;
+    color: #37352f;
+    width: 52px;
+    flex-shrink: 0;
+  }
+
+  .specs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .spec-card {
+    background: #fff;
+    border: 1px solid #e9e9e7;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .spec-pc {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid;
+  }
+
+  .spec-pc.gina   { color: #e16259; border-color: #e16259; }
+  .spec-pc.vincer { color: #448361; border-color: #448361; }
+
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-bottom: 5px;
+    gap: 6px;
+  }
+
+  .spec-key   { color: #9b9a97; flex-shrink: 0; }
+  .spec-val   { color: #37352f; font-weight: 600; text-align: right; }
+
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: #c7c6c3;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>PC Build Benchmark</h1>
+  <p>Gina's PC vs Vincer's PC</p>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot dot-gina"></div> Gina's PC</div>
+  <div class="legend-item"><div class="legend-dot dot-vincer"></div> Vincer's PC</div>
+</div>
+
+<!-- ── BENCHMARK SCORES ── -->
+<div class="section-title">Performance Benchmarks</div>
+
+<div class="card">
+
+  <div class="bench-row">
+    <div class="bench-label">
+      <span class="bench-name">Cinebench R23 (Multi-Core)</span>
+      <span class="bench-winner winner-vincer">Vincer +12%</span>
+    </div>
+    <div class="bars">
+      <div class="bar-row">
+        <span class="bar-pc-name">Gina</span>
+        <div class="bar-track"><div class="bar-fill gina"   style="width:89%"></div></div>
+        <span class="bar-score">18,420</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-pc-name">Vincer</span>
+        <div class="bar-track"><div class="bar-fill vincer" style="width:100%"></div></div>
+        <span class="bar-score">20,650</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="bench-row">
+    <div class="bench-label">
+      <span class="bench-name">3DMark Time Spy (GPU)</span>
+      <span class="bench-winner winner-gina">Gina +8%</span>
+    </div>
+    <div class="bars">
+      <div class="bar-row">
+        <span class="bar-pc-name">Gina</span>
+        <div class="bar-track"><div class="bar-fill gina"   style="width:100%"></div></div>
+        <span class="bar-score">14,810</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-pc-name">Vincer</span>
+        <div class="bar-track"><div class="bar-fill vincer" style="width:92%"></div></div>
+        <span class="bar-score">13,720</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="bench-row">
+    <div class="bench-label">
+      <span class="bench-name">PCMark 10 (Productivity)</span>
+      <span class="bench-winner winner-tie">Tied</span>
+    </div>
+    <div class="bars">
+      <div class="bar-row">
+        <span class="bar-pc-name">Gina</span>
+        <div class="bar-track"><div class="bar-fill gina"   style="width:97%"></div></div>
+        <span class="bar-score">8,940</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-pc-name">Vincer</span>
+        <div class="bar-track"><div class="bar-fill vincer" style="width:100%"></div></div>
+        <span class="bar-score">9,210</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="bench-row">
+    <div class="bench-label">
+      <span class="bench-name">CrystalDisk (Sequential Read)</span>
+      <span class="bench-winner winner-vincer">Vincer +35%</span>
+    </div>
+    <div class="bars">
+      <div class="bar-row">
+        <span class="bar-pc-name">Gina</span>
+        <div class="bar-track"><div class="bar-fill gina"   style="width:74%"></div></div>
+        <span class="bar-score">5,100 MB/s</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-pc-name">Vincer</span>
+        <div class="bar-track"><div class="bar-fill vincer" style="width:100%"></div></div>
+        <span class="bar-score">6,900 MB/s</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="bench-row">
+    <div class="bench-label">
+      <span class="bench-name">Blender (Classroom, GPU)</span>
+      <span class="bench-winner winner-gina">Gina +18%</span>
+    </div>
+    <div class="bars">
+      <div class="bar-row">
+        <span class="bar-pc-name">Gina</span>
+        <div class="bar-track"><div class="bar-fill gina"   style="width:100%"></div></div>
+        <span class="bar-score">412 samples</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-pc-name">Vincer</span>
+        <div class="bar-track"><div class="bar-fill vincer" style="width:85%"></div></div>
+        <span class="bar-score">350 samples</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── SPECS ── -->
+<div class="section-title">Build Specs</div>
+
+<div class="specs-grid">
+  <div class="spec-card">
+    <div class="spec-pc gina">Gina's PC</div>
+    <div class="spec-row"><span class="spec-key">CPU</span><span class="spec-val">Ryzen 7 7700X</span></div>
+    <div class="spec-row"><span class="spec-key">GPU</span><span class="spec-val">RTX 4070 Ti</span></div>
+    <div class="spec-row"><span class="spec-key">RAM</span><span class="spec-val">32GB DDR5</span></div>
+    <div class="spec-row"><span class="spec-key">SSD</span><span class="spec-val">1TB NVMe</span></div>
+    <div class="spec-row"><span class="spec-key">Cost</span><span class="spec-val">$1,450</span></div>
+  </div>
+  <div class="spec-card">
+    <div class="spec-pc vincer">Vincer's PC</div>
+    <div class="spec-row"><span class="spec-key">CPU</span><span class="spec-val">Core i9-13900K</span></div>
+    <div class="spec-row"><span class="spec-key">GPU</span><span class="spec-val">RTX 4070</span></div>
+    <div class="spec-row"><span class="spec-key">RAM</span><span class="spec-val">64GB DDR5</span></div>
+    <div class="spec-row"><span class="spec-key">SSD</span><span class="spec-val">2TB NVMe</span></div>
+    <div class="spec-row"><span class="spec-key">Cost</span><span class="spec-val">$1,680</span></div>
+  </div>
+</div>
+
+<div class="footer">Update the values in pc-benchmark-embed.html to match your actual scores.</div>
+
+</body>
+</html>

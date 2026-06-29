@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bored Shutter — Portfolio</title>
+    <meta name="author" content="Cris Bedoya">
+    <meta name="description" content="— videographer based in southern california specializing in making the world look cinematic">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+
+    <!-- Radwave Demo — display typeface for large headings -->
+    <link rel="preconnect" href="https://fonts.cdnfonts.com">
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/radwave-demo">
+
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+    <!--
+        Restore saved theme before Tailwind paints to prevent a flash.
+        Mirrors the THEMES array in the main script block below.
+    -->
+    <script>
+        (function () {
+            // Prevent browser from smoothly "restoring" scroll position on reload
+            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            window.scrollTo(0, 0);
+
+            var map = {
+                ash:   { bg: '#c8c5c0', accent: '#26231f', surface: 'rgba(200,197,192,0.88)' },
+                ink:   { bg: '#363636', accent: '#f0ead6', surface: 'rgba(54,54,54,0.88)'    },
+                coal:  { bg: '#1a1918', accent: '#aeaaa4', surface: 'rgba(26,25,24,0.88)'    },
+                slate: { bg: '#4a4e54', accent: '#c6cad0', surface: 'rgba(74,78,84,0.88)'    },
+            };
+            var t = map[localStorage.getItem('bs-theme')] || map.ash;
+            var r = document.documentElement;
+            r.style.setProperty('--color-cream',   t.bg);
+            r.style.setProperty('--color-accent',  t.accent);
+            r.style.setProperty('--color-surface', t.surface);
+        })();
+    </script>
+
+    <style type="text/tailwindcss">
+        @font-face {
+            font-family: 'Gilroy';
+            src: url('https://cdn.jsdelivr.net/gh/mahmoud-esmail/Gilroy-Font@master/fonts/Gilroy-Medium.woff2') format('woff2');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Gilroy';
+            src: url('https://cdn.jsdelivr.net/gh/mahmoud-esmail/Gilroy-Font@master/fonts/Gilroy-Bold.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        /* ─── Tailwind v4 Design Tokens ──────────────────────────────── */
+        @theme {
+            --font-display: 'Radwave Demo', 'Gilroy', sans-serif;
+            --font-body:    'Gilroy', sans-serif;
+            --color-cream:  #c8c5c0;  /* page bg — overridden per theme by JS */
+            --color-accent: #26231f;  /* ink / text / CTAs — overridden per theme */
+        }
+
+        /* Surface token: used via var() only, not as a Tailwind utility */
+        :root {
+            --color-surface: rgba(200, 197, 192, 0.88);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        /* ─── Font Enforcement ───────────────────────────────────────── */
+        /*
+            Radwave Demo ships as a single-weight decorative typeface.
+            font-weight: 400 prevents the browser synthesising faux-bold,
+            which distorts the letterforms. The font reads as "display bold"
+            at natural weight due to its inherent stroke contrast.
+        */
+        h1, h2, h3, .font-display {
+            font-family: var(--font-display) !important;
+            font-weight: 400;
+        }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* ─── Keyframes ──────────────────────────────────────────────── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        /* ─── Global Color Transitions (theme switching) ─────────────── */
+        /*
+            Only targets semantic elements; excludes .reveal so its motion
+            transition (opacity + transform) isn't overridden by this rule.
+            Color transitions for .reveal elements are merged into .reveal below.
+        */
+        html, body, header, section, footer,
+        h1, h2, h3, p, figcaption, span, a, button {
+            transition:
+                color            500ms ease-in-out,
+                background-color 500ms ease-in-out,
+                border-color     500ms ease-in-out;
+        }
+
+        /* ─── Scroll Reveal — base ───────────────────────────────────── */
+        /*
+            Color transitions are merged here so theme changes still animate
+            on .reveal elements (which override the global rule above via
+            higher specificity).
+        */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition:
+                opacity          1.2s  cubic-bezier(0.16, 1, 0.32, 1),
+                transform        1.2s  cubic-bezier(0.16, 1, 0.32, 1),
+                color            500ms ease-in-out,
+                background-color 500ms ease-in-out,
+                border-color     500ms ease-in-out;
+            will-change: transform, opacity;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ─── Phase 2 — Image Micro-Animation ───────────────────────── */
+        /*
+            .img-zoom lives inside an overflow-hidden wrapper, so the subtle
+            scale starting at 1.04 is clipped at the rounded frame edge.
+            The scale settles to 1.0 once the parent figure becomes .active.
+        */
+        figure.reveal .img-zoom {
+            transform: scale(1.04);
+            transition:
+                transform        1.6s  cubic-bezier(0.16, 1, 0.32, 1),
+                background-color 500ms ease-in-out;
+            will-change: transform;
+        }
+        figure.reveal.active .img-zoom {
+            transform: scale(1.0);
+        }
+        /* Subtle hover scale once the reveal has settled */
+        figure.reveal.active .img-zoom:hover {
+            transform: scale(1.02);
+        }
+
+        /* ─── Reduced Motion Overrides ───────────────────────────────── */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                transform: none;
+                transition:
+                    opacity          0.4s  ease,
+                    color            500ms ease-in-out,
+                    background-color 500ms ease-in-out,
+                    border-color     500ms ease-in-out;
+            }
+            figure.reveal .img-zoom,
+            figure.reveal.active .img-zoom,
+            figure.reveal.active .img-zoom:hover {
+                transform: scale(1);
+                transition: background-color 500ms ease-in-out;
+            }
+        }
+
+        /* ─── Navigation ─────────────────────────────────────────────── */
+        .nav-link {
+            color: var(--color-accent);
+            opacity: 0.6;
+            transition:
+                opacity          0.2s  ease,
+                color            500ms ease-in-out,
+                background-color 500ms ease-in-out;
+        }
+        .nav-link:hover { opacity: 1; }
+        .nav-link[data-active="true"] {
+            background-color: var(--color-accent) !important;
+            color: var(--color-cream) !important;  /* always contrasts with accent */
+            opacity: 1;
+        }
+
+        /* ─── Gallery — Featured Viewer + Thumbnail Strip ────────────── */
+
+        /*
+            Stack: .gallery-main-wrap is the clipping container (overflow:hidden).
+            All .gallery-slot children are position:absolute and cross-fade.
+            z-index ensures the exiting slot (blurring out) sits above the
+            incoming slot briefly, so blur bridges the crossfade seam.
+        */
+        .gallery-main-wrap {
+            position: relative;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        .gallery-slot {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transform: scale(1.03);
+            filter: blur(0px);
+            pointer-events: none;
+            z-index: 0;
+            transition:
+                opacity    700ms cubic-bezier(0.23, 1, 0.32, 1),
+                transform  700ms cubic-bezier(0.23, 1, 0.32, 1),
+                filter     500ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .gallery-slot.active {
+            opacity: 1;
+            transform: scale(1.0);
+            pointer-events: auto;
+            z-index: 1;
+        }
+        /* Exit: blur-bridge technique — blurs the outgoing image so the
+           crossfade seam between two solid colors is never jarring */
+        .gallery-slot.exit {
+            opacity: 0;
+            transform: scale(0.97);
+            filter: blur(5px);
+            z-index: 2;
+        }
+
+        /* Strip wrapper — houses the strip, its nav arrows, and edge fades */
+        .gallery-strip-nav {
+            position: relative;
+        }
+
+        /* Gradient fades at each edge — hint at overflow, theme-aware */
+        .gallery-strip-nav::before,
+        .gallery-strip-nav::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 56px;
+            z-index: 5;
+            pointer-events: none;
+            transition: opacity 500ms ease-in-out;
+        }
+        .gallery-strip-nav::before {
+            left: 0;
+            background: linear-gradient(to right, var(--color-cream) 20%, transparent);
+        }
+        .gallery-strip-nav::after {
+            right: 0;
+            background: linear-gradient(to left, var(--color-cream) 20%, transparent);
+        }
+
+        /* Strip scroll arrows — no box, just a bold chevron */
+        .gallery-strip-arrow {
+            position: absolute;
+            top: 0; bottom: 0;
+            z-index: 10;
+            width: 44px;
+            background: none;
+            border: none;
+            color: var(--color-accent);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.35;
+            padding: 0;
+            transition:
+                opacity 180ms cubic-bezier(0.23, 1, 0.32, 1),
+                color   500ms ease-in-out;
+        }
+        .gallery-strip-arrow-left  { left: 0; }
+        .gallery-strip-arrow-right { right: 0; }
+        @media (hover: hover) and (pointer: fine) {
+            .gallery-strip-arrow:hover  { opacity: 1; }
+            .gallery-strip-arrow:active { opacity: 0.55; }
+        }
+
+        /* Strip: horizontal scroll, hidden scrollbar */
+        .gallery-strip {
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .gallery-strip::-webkit-scrollbar { display: none; }
+
+        /* Thumbnail */
+        .gallery-thumb {
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            border-radius: 2px;
+            opacity: 0.35;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+            background: none;
+            display: block;
+            transition:
+                opacity   250ms cubic-bezier(0.23, 1, 0.32, 1),
+                transform 200ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .gallery-thumb.active { opacity: 1; }
+
+        /* Gate hover on real pointer devices — touch triggers false hover */
+        @media (hover: hover) and (pointer: fine) {
+            .gallery-thumb:not(.active):hover { opacity: 0.65; }
+            .gallery-thumb:active             { transform: scale(0.97); }
+        }
+
+        /* Slide-in bottom bar: scaleX 0→1 from left on active thumbnail */
+        .gallery-thumb-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1.5px;
+            background-color: var(--color-accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition:
+                transform        380ms cubic-bezier(0.23, 1, 0.32, 1),
+                background-color 500ms ease-in-out;
+        }
+        .gallery-thumb.active .gallery-thumb-bar { transform: scaleX(1); }
+
+        /* Reduced motion: opacity-only crossfade, no scale / blur / slide */
+        @media (prefers-reduced-motion: reduce) {
+            .gallery-slot {
+                transition: opacity 0.35s ease;
+                transform: none !important;
+                filter:    none !important;
+            }
+            .gallery-slot.exit  { filter: none; transform: none; }
+            .gallery-thumb      { transition: opacity 200ms ease; }
+            .gallery-thumb-bar  { transition: background-color 500ms ease; transform: scaleX(1); }
+        }
+
+        /* ─── Phase 1 — Theme Switcher ───────────────────────────────── */
+        .theme-popover {
+            position: fixed;
+            /* Sit 8px above the trigger (trigger = 44px height at bottom-6) */
+            bottom: calc(1.5rem + 44px + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            background-color: var(--color-cream);
+            border: 1px solid rgba(128, 128, 128, 0.2);
+            border-radius: 999px;
+            box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.18);
+            transition:
+                opacity           220ms ease,
+                transform         220ms ease,
+                background-color  500ms ease-in-out;
+        }
+        .theme-popover.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .theme-swatch {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            flex-shrink: 0;
+            transition: transform 0.18s ease, border-color 0.2s ease;
+        }
+        .theme-swatch:hover        { transform: scale(1.12); }
+        .theme-swatch.active       { border-color: var(--color-accent); }
+        .theme-swatch:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+        }
+
+        #theme-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background-color: var(--color-cream);
+            border: 1px solid rgba(128, 128, 128, 0.25);
+            cursor: pointer;
+            box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.14);
+            transition:
+                transform         0.18s ease,
+                box-shadow        0.18s ease,
+                background-color  500ms ease-in-out;
+        }
+        #theme-trigger:hover {
+            transform: scale(1.06);
+            box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.18);
+        }
+        #theme-trigger:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 3px;
+        }
+
+        /* ─── Iris shutter — background decoration beside figures ──────── */
+
+        .shutter-iris-wrap {
+            position: absolute;
+            transform: translateY(-50%);
+            width: 160px;
+            height: 160px;
+            pointer-events: none;
+            clip-path: circle(73px at center);
+            color: var(--color-accent);
+            transition: color 500ms ease-in-out;
+        }
+        .shutter-iris-wrap-right { right: 0; }
+        .shutter-iris-wrap-left  { left:  0; }
+
+        /* Outer + inner ring circles */
+        .iris-ring { fill: none; }
+
+        /* Outer group — slow ambient rotation */
+        .shutter-iris {
+            transform-origin: 40px 40px;
+            animation: irisRotate 38s linear infinite;
+        }
+        @keyframes irisRotate {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+
+        /* Solid blades — cream stroke creates visible seam between adjacent blades */
+        .iris-blade {
+            stroke: var(--color-cream);
+            stroke-width: 0.8;
+            paint-order: fill stroke;
+            transition: transform 1.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .shutter-iris { animation: none; }
+            .iris-blade   { transition: none; }
+        }
+
+        /* ─── Film strip — scroll-driven, scoped to figures area ────────── */
+        .film-bg {
+            position: absolute;
+            left: 0; right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 90px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.055;
+            color: var(--color-accent);
+            transition: color 500ms ease-in-out;
+        }
+        .film-strip-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 4752px;
+            height: 90px;
+            /* transform driven by JS scroll, no CSS animation */
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-cream text-accent/[0.83] font-sans">
+
+    <!-- ─── Navigation ──────────────────────────────────────────────── -->
+    <header class="fixed inset-x-0 top-5 z-40 flex justify-center px-2 sm:px-4">
+        <nav id="main-nav"
+             class="flex flex-wrap items-center justify-center gap-1 sm:gap-2 rounded-full border border-accent/10 px-2 py-1.5 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.15)] backdrop-blur-xl"
+             style="background-color: var(--color-surface);">
+            <a href="#top"     class="nav-link rounded-full px-3 py-1.5 text-[12px] sm:text-[13px] font-medium" data-active="true">Home</a>
+            <a href="#work"    class="nav-link rounded-full px-3 py-1.5 text-[12px] sm:text-[13px] font-medium">Work</a>
+            <a href="#about"   class="nav-link rounded-full px-3 py-1.5 text-[12px] sm:text-[13px] font-medium">About</a>
+            <a href="#contact" class="nav-link rounded-full px-3 py-1.5 text-[12px] sm:text-[13px] font-medium">Contact</a>
+        </nav>
+    </header>
+
+    <!-- ─── Hero ────────────────────────────────────────────────────── -->
+    <section id="top" class="flex min-h-screen items-center px-4 pt-32 md:px-6">
+        <div class="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 md:grid-cols-12 md:gap-16">
+
+            <div class="md:col-span-7 md:col-start-1"
+                 style="animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.32, 1) forwards;">
+                <p class="font-mono text-[11.5px] uppercase tracking-[0.35em] opacity-50">Bored Shutter — est. 2026</p>
+                <h1 class="mt-6 font-display text-balance text-4xl font-bold leading-[1.15] tracking-tight md:text-[3.25rem] md:leading-[1.1]">
+                    <span>Cris Bedoya</span>
+                    <span style="font-size:0.9em;opacity:0.52;"> — videographer based in</span>
+                    <span> southern california</span>
+                    <span style="font-size:0.9em;opacity:0.52;"> specializing in making the world look</span>
+                    <span> cinematic</span>
+                </h1>
+                <div class="mt-10 flex flex-wrap items-center gap-3">
+                    <a href="#work"
+                       class="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2 text-sm text-cream transition-transform hover:scale-[1.03]">
+                        See the work <span aria-hidden="true">›</span>
+                    </a>
+                    <a href="https://boredshutter.hbportal.co/schedule/6a2df9819857ae12b430ce58"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="inline-flex items-center gap-2 rounded-full border border-accent/20 px-5 py-2 text-sm hover:border-accent">
+                        Book a consultation
+                    </a>
+                </div>
+            </div>
+
+            <a href="#about" aria-label="About the photographer"
+               class="group relative block md:col-span-4 md:col-start-9 md:translate-y-6"
+               style="opacity: 0; animation: fadeIn 1s ease-out forwards; animation-delay: 0.3s;">
+                <div class="overflow-hidden rounded-sm">
+                    <img src="portrait.jpg" alt="Portrait of the photographer"
+                         class="w-full object-cover transition-all duration-[600ms] ease-out group-hover:scale-[1.04]"
+                         style="height: 400px; object-position: center top;">
+                </div>
+                <div class="mt-3 flex items-center justify-between text-[12px] opacity-50 group-hover:opacity-100 tracking-[0.02em]">
+                    <span class="font-mono uppercase tracking-[0.25em]">Portrait</span>
+                    <span>About ↓</span>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- ─── Work ────────────────────────────────────────────────────── -->
+    <section id="work" class="px-4 pt-32 md:px-6 md:pt-48">
+
+        <div class="mx-auto max-w-6xl">
+
+            <div class="reveal mb-16">
+                <p class="font-mono text-[11.5px] uppercase tracking-[0.35em] opacity-50">01 — Featured work</p>
+                <h2 class="mt-4 font-display text-3xl font-bold tracking-tight md:text-5xl">Recent projects</h2>
+            </div>
+
+            <!-- ─── Gallery — Featured Viewer + Thumbnail Selector ─────── -->
+            <div class="reveal mb-24 w-full">
+
+                <!-- Featured viewer: all slots absolute-stacked, clips scale/blur transitions -->
+                <div class="gallery-main-wrap mb-3"
+                     style="height: 520px;"
+                     aria-label="Featured gallery image"
+                     aria-live="polite">
+
+                    <div class="gallery-slot active" data-gi="0">
+                        <div class="w-full h-full flex items-end p-10" style="background:#363636;">
+                            <span class="font-mono text-[11.5px] tracking-[0.35em]" style="color:#aba7a7;">001 — Untitled</span>
+                        </div>
+                    </div>
+                    <div class="gallery-slot" data-gi="1">
+                        <div class="w-full h-full flex items-end p-10" style="background:#021a30;">
+                            <span class="font-mono text-[11.5px] tracking-[0.35em]" style="color:#aba7a7;">002 — Untitled</span>
+                        </div>
+                    </div>
+                    <div class="gallery-slot" data-gi="2">
+                        <div class="w-full h-full flex items-end p-10" style="background:#474747;">
+                            <span class="font-mono text-[11.5px] tracking-[0.35em]" style="color:#c8c8a9;">003 — Untitled</span>
+                        </div>
+                    </div>
+                    <div class="gallery-slot" data-gi="3">
+                        <div class="w-full h-full flex items-end p-10" style="background:#aba7a7;">
+                            <span class="font-mono text-[11.5px] tracking-[0.35em]" style="color:#363636;">004 — Untitled</span>
+                        </div>
+                    </div>
+                    <div class="gallery-slot" data-gi="4">
+                        <div class="w-full h-full flex items-end p-10" style="background:#363636;">
+                            <span class="font-mono text-[11.5px] tracking-[0.35em]" style="color:#f0ead6;">005 — Untitled</span>
+                        </div>
+                    </div>
+                    <div class="gallery-slot" data-gi="5">
+                        <div class="w-full h-full flex items-end p-10" style="background:#c8c8a9;">
+                            <span class="font-mono text-[11.5px] tracking-[0.35em]" style="color:#474747;">006 — Untitled</span>
+                        </div>
+                    </div>
+                    <div class="gallery-slot" data-gi="6">
+                        <div class="w-full h-full flex items-end p-10" style="background:#021a30;">
+                            <span class="font-mono text-[11.5px] tracking-[0.35em]" style="color:#aba7a7;">007 — Untitled</span>
+                        </div>
+                    </div>
+                    <div class="gallery-slot" data-gi="7">
+                        <div class="w-full h-full flex items-end p-10" style="background:#474747;">
+                            <span class="font-mono text-[11.5px] tracking-[0.35em]" style="color:#c8c8a9;">008 — Untitled</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Position counter + scrollable thumbnail strip -->
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-mono text-[11.5px] opacity-30 uppercase tracking-[0.3em]">Select</span>
+                    <span class="font-mono text-[12px] opacity-40"
+                          id="gallery-status"
+                          aria-live="polite"
+                          aria-label="Current image">01 / 08</span>
+                </div>
+
+                <div class="gallery-strip-nav">
+                    <button class="gallery-strip-arrow gallery-strip-arrow-left"
+                            aria-label="Scroll thumbnails to start">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+                             stroke="currentColor" stroke-width="2.5"
+                             stroke-linecap="round" stroke-linejoin="round"
+                             aria-hidden="true">
+                            <polyline points="11,3 5,9 11,15"/>
+                        </svg>
+                    </button>
+
+                    <div id="gallery-strip"
+                         class="gallery-strip flex gap-2"
+                         style="padding: 0 40px;"
+                         role="listbox"
+                         aria-label="Select an image from the gallery">
+
+                        <button class="gallery-thumb active" data-gi="0" role="option" aria-selected="true"  aria-label="Image 1 of 8">
+                            <div style="width:220px;height:138px;background:#363636;"></div>
+                            <div class="gallery-thumb-bar" aria-hidden="true"></div>
+                        </button>
+                        <button class="gallery-thumb" data-gi="1" role="option" aria-selected="false" aria-label="Image 2 of 8">
+                            <div style="width:220px;height:138px;background:#021a30;"></div>
+                            <div class="gallery-thumb-bar" aria-hidden="true"></div>
+                        </button>
+                        <button class="gallery-thumb" data-gi="2" role="option" aria-selected="false" aria-label="Image 3 of 8">
+                            <div style="width:220px;height:138px;background:#474747;"></div>
+                            <div class="gallery-thumb-bar" aria-hidden="true"></div>
+                        </button>
+                        <button class="gallery-thumb" data-gi="3" role="option" aria-selected="false" aria-label="Image 4 of 8">
+                            <div style="width:220px;height:138px;background:#aba7a7;"></div>
+                            <div class="gallery-thumb-bar" aria-hidden="true"></div>
+                        </button>
+                        <button class="gallery-thumb" data-gi="4" role="option" aria-selected="false" aria-label="Image 5 of 8">
+                            <div style="width:220px;height:138px;background:#363636;"></div>
+                            <div class="gallery-thumb-bar" aria-hidden="true"></div>
+                        </button>
+                        <button class="gallery-thumb" data-gi="5" role="option" aria-selected="false" aria-label="Image 6 of 8">
+                            <div style="width:220px;height:138px;background:#c8c8a9;"></div>
+                            <div class="gallery-thumb-bar" aria-hidden="true"></div>
+                        </button>
+                        <button class="gallery-thumb" data-gi="6" role="option" aria-selected="false" aria-label="Image 7 of 8">
+                            <div style="width:220px;height:138px;background:#021a30;"></div>
+                            <div class="gallery-thumb-bar" aria-hidden="true"></div>
+                        </button>
+                        <button class="gallery-thumb" data-gi="7" role="option" aria-selected="false" aria-label="Image 8 of 8">
+                            <div style="width:220px;height:138px;background:#474747;"></div>
+                            <div class="gallery-thumb-bar" aria-hidden="true"></div>
+                        </button>
+
+                    </div>
+
+                    <button class="gallery-strip-arrow gallery-strip-arrow-right"
+                            aria-label="Scroll thumbnails to end">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+                             stroke="currentColor" stroke-width="2.5"
+                             stroke-linecap="round" stroke-linejoin="round"
+                             aria-hidden="true">
+                            <polyline points="7,3 13,9 7,15"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ─── Project Figures ───────────────────────────────────── -->
+            <div id="figures-wrap" class="relative space-y-28">
+
+                <!-- Film strip scoped to figures area; hidden beneath image blocks -->
+                <div class="film-bg" aria-hidden="true">
+                    <svg class="film-strip-svg" id="film-strip-svg"
+                         viewBox="0 0 4752 90" preserveAspectRatio="none"
+                         fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <pattern id="film-unit" x="0" y="0" width="88" height="90"
+                                     patternUnits="userSpaceOnUse">
+                                <rect x="8" y="16" width="72" height="58" rx="1"
+                                      stroke="currentColor" stroke-width="1" fill="none"/>
+                                <rect x="10" y="3"  width="8" height="7" rx="1.5" fill="currentColor"/>
+                                <rect x="40" y="3"  width="8" height="7" rx="1.5" fill="currentColor"/>
+                                <rect x="70" y="3"  width="8" height="7" rx="1.5" fill="currentColor"/>
+                                <rect x="10" y="80" width="8" height="7" rx="1.5" fill="currentColor"/>
+                                <rect x="40" y="80" width="8" height="7" rx="1.5" fill="currentColor"/>
+                                <rect x="70" y="80" width="8" height="7" rx="1.5" fill="currentColor"/>
+                                <line x1="0" y1="13" x2="88" y2="13" stroke="currentColor" stroke-width="0.5"/>
+                                <line x1="0" y1="77" x2="88" y2="77" stroke="currentColor" stroke-width="0.5"/>
+                            </pattern>
+                        </defs>
+                        <rect width="4752" height="90" fill="url(#film-unit)"/>
+                    </svg>
+                </div>
+
+                <!-- Figure 1 — left-aligned, iris shutter right -->
+                <figure class="reveal relative z-10 w-full md:w-10/12">
+                    <div class="overflow-hidden rounded-sm" style="background-color: var(--color-cream);">
+                        <div role="img" aria-label="Project 1"
+                             class="img-zoom w-full bg-accent opacity-10"
+                             style="height: 450px;"></div>
+                    </div>
+                    <figcaption class="mt-3 flex justify-between text-[12px] opacity-50 tracking-[0.02em]">
+                        <span>title</span>
+                        <span>format-date</span>
+                    </figcaption>
+                    <div class="shutter-iris-wrap shutter-iris-wrap-right hidden md:flex"
+                         style="top: 50%; right: -18%;" aria-hidden="true">
+                        <svg viewBox="0 0 80 80" fill="none" style="width:100%;height:100%;">
+                            <circle cx="40" cy="40" r="36" class="iris-ring" stroke="currentColor" stroke-width="0.8"/>
+                            <g class="shutter-iris">
+                                <g transform="rotate(60 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(120 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(180 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(240 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(300 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(0 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(60 40 40)" clip-path="url(#ica)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                            </g>
+                            <circle cx="40" cy="40" r="4" class="iris-ring" stroke="currentColor" stroke-width="0.8"/>
+                            <defs><clipPath id="ica"><path d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></clipPath></defs>
+                        </svg>
+                    </div>
+                </figure>
+
+                <!-- Figure 2 — right-aligned, iris shutter left -->
+                <figure class="reveal relative z-10 w-full md:w-10/12 md:ml-auto">
+                    <div class="overflow-hidden rounded-sm" style="background-color: var(--color-cream);">
+                        <div role="img" aria-label="Project 2"
+                             class="img-zoom w-full bg-accent opacity-10"
+                             style="height: 450px;"></div>
+                    </div>
+                    <figcaption class="mt-3 flex justify-between text-[12px] opacity-50 tracking-[0.02em]">
+                        <span>title</span>
+                        <span>format-date</span>
+                    </figcaption>
+                    <div class="shutter-iris-wrap shutter-iris-wrap-left hidden md:flex"
+                         style="top: 50%; left: -18%;" aria-hidden="true">
+                        <svg viewBox="0 0 80 80" fill="none" style="width:100%;height:100%;">
+                            <circle cx="40" cy="40" r="36" class="iris-ring" stroke="currentColor" stroke-width="0.8"/>
+                            <g class="shutter-iris">
+                                <g transform="rotate(60 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(120 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(180 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(240 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(300 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(0 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(60 40 40)" clip-path="url(#icb)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                            </g>
+                            <circle cx="40" cy="40" r="4" class="iris-ring" stroke="currentColor" stroke-width="0.8"/>
+                            <defs><clipPath id="icb"><path d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></clipPath></defs>
+                        </svg>
+                    </div>
+                </figure>
+
+                <!-- Figure 3 — left-aligned, iris shutter right -->
+                <figure class="reveal relative z-10 w-full md:w-10/12">
+                    <div class="overflow-hidden rounded-sm" style="background-color: var(--color-cream);">
+                        <div role="img" aria-label="Project 3"
+                             class="img-zoom w-full bg-accent opacity-10"
+                             style="height: 450px;"></div>
+                    </div>
+                    <figcaption class="mt-3 flex justify-between text-[12px] opacity-50 tracking-[0.02em]">
+                        <span>title</span>
+                        <span>format-date</span>
+                    </figcaption>
+                    <div class="shutter-iris-wrap shutter-iris-wrap-right hidden md:flex"
+                         style="top: 50%; right: -18%;" aria-hidden="true">
+                        <svg viewBox="0 0 80 80" fill="none" style="width:100%;height:100%;">
+                            <circle cx="40" cy="40" r="36" class="iris-ring" stroke="currentColor" stroke-width="0.8"/>
+                            <g class="shutter-iris">
+                                <g transform="rotate(60 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(120 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(180 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(240 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(300 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(0 40 40)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                                <g transform="rotate(60 40 40)" clip-path="url(#icc)"><path class="iris-blade" fill="currentColor" d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></g>
+                            </g>
+                            <circle cx="40" cy="40" r="4" class="iris-ring" stroke="currentColor" stroke-width="0.8"/>
+                            <defs><clipPath id="icc"><path d="M 48 10 C 44 26, 36 58, 32 74 L 22 72 C 8 54, 12 28, 35 7 Z"/></clipPath></defs>
+                        </svg>
+                    </div>
+                </figure>
+
+            </div>
+
+
+        </div>
+    </section>
+
+    <!-- ─── About ───────────────────────────────────────────────────── -->
+    <section id="about" class="px-4 pt-40 md:px-6 md:pt-56">
+        <div class="mx-auto max-w-4xl">
+            <p class="reveal font-mono text-[11.5px] uppercase tracking-[0.35em] opacity-50">02 — About</p>
+            <p class="reveal font-display mt-8 text-2xl leading-[1.4] tracking-tight md:text-3xl">
+                Everything has a story,<br>
+                I'm here to show it.
+            </p>
+            <div class="reveal mt-20 grid grid-cols-2 gap-y-10 text-[15px] tracking-[0.018em] md:grid-cols-4">
+                <div>
+                    <p class="font-mono text-[11.5px] uppercase tracking-[0.3em] opacity-50">Based</p>
+                    <p class="mt-2">Southern California</p>
+                    <p class="mt-2 opacity-35">[Available for travel]</p>
+                </div>
+                <div>
+                  <p class="font-mono text-[11.5px] uppercase tracking-[0.3em] opacity-50 mb-2">Featured Businesses</p>
+                  
+                  <div class="flex flex-col items-start gap-1">
+                    
+                    <a href="https://www.instagram.com/p/DWfPdibjyXV/" target="_blank" rel="noreferrer noopener" class="group inline-flex items-center gap-2 hover:opacity-60 underline underline-offset-2">
+                      <span>@Ballhog Golf</span>
+                    </a>
+
+                    <a href="https://www.instagram.com/jogdawgs/reel/DW3CMuRDPt0/" target="_blank" rel="noreferrer noopener" class="group inline-flex items-center gap-2 hover:opacity-60 underline underline-offset-2">
+                      <span>@Jog Dawgs</span>
+                    </a>
+
+                    <a href="https://www.instagram.com/p/DZQm9tmS3Kg/" target="_blank" rel="noreferrer noopener" class="group inline-flex items-center gap-2 hover:opacity-60 underline underline-offset-2">
+                      <span>@Sister Sister Cafe</span>
+                    </a>
+                
+                  </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── Contact ─────────────────────────────────────────────────── -->
+    <section id="contact" class="px-4 pt-40 pb-32 md:px-6 md:pt-56">
+        <div class="mx-auto max-w-4xl">
+            <p class="reveal font-mono text-[11.5px] uppercase tracking-[0.35em] opacity-50">03 — Contact</p>
+            <h2 class="reveal mt-6 font-display font-bold leading-[0.95] tracking-tight">
+                <span class="block text-4xl md:text-5xl">Still</span>
+                <span class="block text-5xl md:text-6xl">bored?</span>
+            </h2>
+            <a href="https://www.instagram.com/bored.shutter/" target="_blank" rel="noreferrer noopener"
+                   class="group inline-flex items-center gap-2 hover:opacity-60">
+                    <span>Instagram</span><span class="text-[12px]">[@bored.shutter]</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- ─── Footer ──────────────────────────────────────────────────── -->
+    <footer class="mt-40 px-4 py-10 md:px-6">
+        <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 border-t border-accent/10 pt-8 text-[12px] opacity-60 md:flex-row">
+            <p class="font-display text-base font-bold tracking-tight">Bored Shutter</p>
+            <p>© 2026 — All rights reserved</p>
+        </div>
+    </footer>
+
+    <!-- ─── Phase 1: Theme Switcher UI ──────────────────────────────── -->
+    <div id="theme-anchor" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+
+        <!-- Popover — floats above trigger, cross-fades open/closed -->
+        <div id="theme-popover"
+             class="theme-popover"
+             role="dialog"
+             aria-label="Color theme selection">
+            <button class="theme-swatch active"
+                    data-theme="ash"
+                    style="background: #c8c5c0;"
+                    aria-label="Ash — light warm gray"></button>
+            <button class="theme-swatch"
+                    data-theme="ink"
+                    style="background: #363636;"
+                    aria-label="Ink — dark charcoal"></button>
+            <button class="theme-swatch"
+                    data-theme="coal"
+                    style="background: #1a1918;"
+                    aria-label="Coal — near black"></button>
+            <button class="theme-swatch"
+                    data-theme="slate"
+                    style="background: #4a4e54;"
+                    aria-label="Slate — cool gray"></button>
+        </div>
+
+        <!-- Trigger button -->
+        <button id="theme-trigger"
+                aria-label="Open theme switcher"
+                aria-expanded="false"
+                aria-controls="theme-popover">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.15em; color:var(--color-accent); opacity:0.6;"
+                  aria-hidden="true">◑</span>
+        </button>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ═══════════════════════════════════════════════════════════════
+            // PHASE 1 — Theme System
+            // ═══════════════════════════════════════════════════════════════
+
+            const THEMES = [
+                { name: 'ash',   bg: '#c8c5c0', accent: '#26231f', surface: 'rgba(200,197,192,0.88)' },
+                { name: 'ink',   bg: '#363636', accent: '#f0ead6', surface: 'rgba(54,54,54,0.88)'    },
+                { name: 'coal',  bg: '#1a1918', accent: '#aeaaa4', surface: 'rgba(26,25,24,0.88)'    },
+                { name: 'slate', bg: '#4a4e54', accent: '#c6cad0', surface: 'rgba(74,78,84,0.88)'    },
+            ];
+
+            /** Writes CSS custom properties to :root; all Tailwind utilities
+             *  that reference --color-cream / --color-accent update instantly. */
+            function applyTheme(theme) {
+                const root = document.documentElement;
+                root.style.setProperty('--color-cream',   theme.bg);
+                root.style.setProperty('--color-accent',  theme.accent);
+                root.style.setProperty('--color-surface', theme.surface);
+                localStorage.setItem('bs-theme', theme.name);
+
+                document.querySelectorAll('.theme-swatch').forEach(s => {
+                    s.classList.toggle('active', s.dataset.theme === theme.name);
+                });
+            }
+
+            // Restore persisted theme (inline script already ran, but this
+            // also marks the correct swatch as .active on DOMContentLoaded)
+            const saved = THEMES.find(t => t.name === localStorage.getItem('bs-theme')) || THEMES[0]; // default: ash
+            applyTheme(saved);
+
+            const trigger = document.getElementById('theme-trigger');
+            const popover = document.getElementById('theme-popover');
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const opening = !popover.classList.contains('open');
+                popover.classList.toggle('open', opening);
+                trigger.setAttribute('aria-expanded', String(opening));
+            });
+
+            // Close on any outside click
+            document.addEventListener('click', () => {
+                popover.classList.remove('open');
+                trigger.setAttribute('aria-expanded', 'false');
+            });
+
+            // Prevent the above from firing when clicking inside the popover
+            popover.addEventListener('click', e => e.stopPropagation());
+
+            document.querySelectorAll('.theme-swatch').forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    const theme = THEMES.find(t => t.name === swatch.dataset.theme);
+                    if (!theme) return;
+                    applyTheme(theme);
+                    // Brief delay lets the user see the theme change before closing
+                    setTimeout(() => {
+                        popover.classList.remove('open');
+                        trigger.setAttribute('aria-expanded', 'false');
+                    }, 320);
+                });
+            });
+
+
+            // ═══════════════════════════════════════════════════════════════
+            // PHASE 2 — Scroll Reveal
+            // (.img-zoom scale animation is pure CSS; this just toggles .active)
+            // ═══════════════════════════════════════════════════════════════
+
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { root: null, threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+
+            document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+
+            // ═══════════════════════════════════════════════════════════════
+            // Navigation active-section tracking
+            // ═══════════════════════════════════════════════════════════════
+
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const navObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.setAttribute('data-active', 'true');
+                            } else {
+                                link.removeAttribute('data-active');
+                            }
+                        });
+                    }
+                });
+            }, { root: null, threshold: 0, rootMargin: '-50% 0px -50% 0px' });
+
+            document.querySelectorAll('section').forEach(s => navObserver.observe(s));
+
+
+            // ═══════════════════════════════════════════════════════════════
+            // Gallery — Featured Viewer + Manual Thumbnail Selector
+            // No auto-advance, no strip drift — user scrolls and selects.
+            // ═══════════════════════════════════════════════════════════════
+
+            const gallerySlots  = document.querySelectorAll('.gallery-slot');
+            const galleryThumbs = document.querySelectorAll('.gallery-thumb');
+            const galleryStatus = document.getElementById('gallery-status');
+            const GALLERY_COUNT = gallerySlots.length;
+            let activeGI = 0;
+
+            /**
+             * Cross-fades from activeGI to index.
+             * Exiting slot blurs out at z:2 (blur-bridge technique);
+             * entering slot fades in at z:1 beneath it.
+             */
+            function selectGallery(index) {
+                const next = ((index % GALLERY_COUNT) + GALLERY_COUNT) % GALLERY_COUNT;
+                if (next === activeGI) return;
+
+                const exiting = gallerySlots[activeGI];
+                exiting.classList.remove('active');
+                exiting.classList.add('exit');
+                exiting.addEventListener('transitionend', () => {
+                    exiting.classList.remove('exit');
+                }, { once: true });
+
+                activeGI = next;
+                gallerySlots[activeGI].classList.add('active');
+
+                galleryThumbs.forEach((t, i) => {
+                    const sel = i === activeGI;
+                    t.classList.toggle('active', sel);
+                    t.setAttribute('aria-selected', String(sel));
+                });
+
+                if (galleryStatus) {
+                    galleryStatus.textContent =
+                        `${String(activeGI + 1).padStart(2, '0')} / ${String(GALLERY_COUNT).padStart(2, '0')}`;
+                }
+            }
+
+            galleryThumbs.forEach((thumb, i) => {
+                thumb.addEventListener('click', () => selectGallery(i));
+            });
+
+            // Strip scroll arrows — jump to full start / end
+            const galleryStrip = document.getElementById('gallery-strip');
+            document.querySelector('.gallery-strip-arrow-left')?.addEventListener('click', () => {
+                galleryStrip?.scrollTo({ left: 0, behavior: 'smooth' });
+            });
+            document.querySelector('.gallery-strip-arrow-right')?.addEventListener('click', () => {
+                galleryStrip?.scrollTo({ left: galleryStrip.scrollWidth, behavior: 'smooth' });
+            });
+
+            // Iris open/close
+            // All blades share the same path (petal pointing up). Rotating all by
+            // the same delta just spins the whole assembly — the filled circle never
+            // changes visually. Instead, scale each blade 0→1 from the centre origin
+            // so blades unfurl outward on open and collapse to a point on close.
+            (function () {
+                function setIris(wrap, open) {
+                    wrap.querySelectorAll('.iris-blade').forEach(function (blade) {
+                        blade.style.transformOrigin = '40px 8px';
+                        blade.style.transform = open ? 'rotate(45deg)' : 'rotate(0deg)';
+                    });
+                }
+
+                var irisWraps = Array.from(document.querySelectorAll('.shutter-iris-wrap'));
+                irisWraps.forEach(function (wrap) { setIris(wrap, false); });
+
+                function tickIris() {
+                    var vH = window.innerHeight;
+                    irisWraps.forEach(function (wrap) {
+                        var rect = wrap.getBoundingClientRect();
+                        if (rect.width === 0 && rect.height === 0) return;
+                        var centerY = rect.top + rect.height * 0.5;
+                        setIris(wrap, centerY > vH * 0.2 && centerY < vH * 0.8);
+                    });
+                }
+
+                window.addEventListener('scroll', tickIris, { passive: true });
+                tickIris();
+            }());
+
+            // Scroll-driven film strip
+            const filmStripEl  = document.getElementById('film-strip-svg');
+            const figuresWrap  = document.getElementById('figures-wrap');
+            const FILM_MAX     = 2376;
+            function tickFilm() {
+                if (!filmStripEl || !figuresWrap) return;
+                const rect     = figuresWrap.getBoundingClientRect();
+                const total    = figuresWrap.offsetHeight + window.innerHeight;
+                const progress = Math.max(0, Math.min(1, (-rect.top + window.innerHeight) / total));
+                filmStripEl.style.transform = `translateX(${-progress * FILM_MAX}px)`;
+            }
+            window.addEventListener('scroll', tickFilm, { passive: true });
+            tickFilm();
+        });
+    </script>
+</body>
+</html>
